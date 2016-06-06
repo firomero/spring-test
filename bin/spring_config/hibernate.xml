@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<!-- configuracion de hibernate -->
+
+	<!-- cargar el hibernate.properties -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>hibernate.properties</value>
+		</property>
+	</bean>
+	<!-- *********************************** -->
+
+	<!-- cargar el datasource -->
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="url">
+			<value>${hibernate.connection.url}</value>
+		</property>
+		<property name="driverClassName">
+			<value>${hibernate.connection.driver_class}</value>
+		</property>
+		<property name="username">
+			<value>${hibernate.connection.username}</value>
+		</property>
+		<property name="password">
+			<value>${hibernate.connection.password}</value>
+		</property>
+		<property name="initialSize">
+			<value>${dbcp.initialSize}</value>
+		</property>
+		<property name="maxActive">
+			<value>${dbcp.maxActive}</value>
+		</property>
+		<property name="maxIdle">
+			<value>${dbcp.maxIdle}</value>
+		</property>
+		<property name="minIdle">
+			<value>${dbcp.minIdle}</value>
+		</property>
+		<property name="maxWait">
+			<value>${dbcp.maxWait}</value>
+		</property>
+	</bean>
+
+	<!-- configuracion del session Factory de hibernate -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="mappingDirectoryLocations">
+			<list>
+				<value>/curso/ejemplos/bean/mappings</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					${hibernate.dialect}
+				</prop>
+				<prop key="hibernate.hbm2ddl.auto">
+					${hibernate.hbm2ddl.auto}
+				</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+
+
+	<!-- 	TRANSACCIONES	 -->
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<!-- proxys para los servicios (proxyxs para que los beanes de 
+		negocio ejecuten sus operaciones en contextos transaccionales)-->
+	<bean id="estudianteService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="target">
+			<ref bean="estudianteServiceTarget" />
+		</property>
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="transactionAttributeSource">
+			<ref bean="transactionAttributeSource" />
+		</property>
+	</bean>
+
+	<bean id="grupoService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="target">
+			<ref bean="grupoServiceTarget" />
+		</property>
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="transactionAttributeSource">
+			<ref bean="transactionAttributeSource" />
+		</property>
+	</bean>
+
+	<!-- atributos de la transaccion -->
+	<bean id="transactionAttributeSource"
+		class="org.springframework.transaction.interceptor.MatchAlwaysTransactionAttributeSource">
+	</bean>
+</beans>

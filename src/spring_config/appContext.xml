@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<!-- configuracion de los beanes de negocio -->
+	<bean id="estudianteServiceTarget" 
+		class="curso.ejemplos.service.impl.EstudianteServiceImpl">
+		<property name="estudianteDao">
+			<bean class="curso.ejemplos.dao.impl.EstudianteDaoImpl">
+				<property name="sessionFactory">
+					<ref bean="sessionFactory" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="grupoServiceTarget"
+		class="curso.ejemplos.service.impl.GrupoServiceImpl">
+		<property name="grupoDao">
+			<bean class="curso.ejemplos.dao.impl.GrupoDaoImpl">
+				<property name="sessionFactory">
+					<ref bean="sessionFactory" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+</beans>
